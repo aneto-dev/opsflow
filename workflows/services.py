@@ -79,6 +79,20 @@ class WorkflowService:
     ) -> WorkflowDecision:
         step_run = WorkflowStepRun.objects.select_related("workflow_run", "step").get(id=step_run_id)
 
+        if step_run.status != WorkflowStepRun.Status.IN_PROGRESS:
+            raise ValueError("Only in-progress steps can be decided.")
+
+        if step_run.decisions.exists():
+            raise ValueError("This step has already been decided.")
+
+        if step_run.workflow_run.status == WorkflowRun.Status.COMPLETED:
+            raise ValueError("Completed workflows cannot be modified.")
+        
+        valid_outcomes = {choice[0] for choice in WorkflowDecision.Outcome.choices}
+
+        if outcome not in valid_outcomes:
+            raise ValueError(f"Invalid decision outcome: {outcome}")
+
         decision = WorkflowDecision.objects.create(
             step_run=step_run,
             outcome=outcome,
