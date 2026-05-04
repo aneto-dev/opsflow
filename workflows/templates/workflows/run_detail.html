@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ run.reference }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f9fafb;
+            color: #111827;
+        }
+
+        h1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .muted {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.in_progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ run.reference }}</h1>
+    <div class="muted">{{ run.workflow.name }}</div>
+
+    <div class="card">
+        <strong>Status:</strong>
+        <span class="badge {{ run.status }}">{{ run.get_status_display }}</span>
+        <br><br>
+        <strong>Started By:</strong> {{ run.started_by }}<br>
+        <strong>Started At:</strong> {{ run.started_at }}<br>
+        <strong>Completed At:</strong> {{ run.completed_at|default:"—" }}
+    </div>
+
+    {% if active_step %}
+    <div class="card">
+        <h2>Make Decision</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ decision_form.as_p }}
+            <button type="submit">Submit Decision</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <h2>Steps</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Step</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Started</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for step in run.step_runs.all %}
+            <tr>
+                <td>{{ step.step.name }}</td>
+                <td>{{ step.assigned_to }}</td>
+                <td>
+                    <span class="badge {{ step.status }}">
+                        {{ step.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ step.started_at|default:"—" }}</td>
+                <td>{{ step.completed_at|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No steps found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
