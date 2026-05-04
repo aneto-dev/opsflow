@@ -53,9 +53,15 @@ class WorkflowService:
         if not next_step:
             WorkflowService._complete_workflow(workflow_run)
             return
+        
+
+        next_step.assigned_to = WorkflowService._resolve_actor(
+            next_step.step.assigned_role,
+            workflow_run,
+        )
 
         next_step.status = WorkflowStepRun.Status.IN_PROGRESS
-        next_step.save(update_fields=["status"])
+        next_step.save(update_fields=["status", "assigned_to"])
 
     @staticmethod
     def _complete_workflow(workflow_run: WorkflowRun) -> None:
@@ -90,3 +96,12 @@ class WorkflowService:
             WorkflowService._activate_next_step(step_run.workflow_run)
 
         return decision
+    
+    @staticmethod
+    def _resolve_actor(role, workflow_run):
+        role_map = {
+            "manager": workflow_run.started_by,
+            "finance": "finance.user",
+        }
+
+        return role_map.get(role, "system")

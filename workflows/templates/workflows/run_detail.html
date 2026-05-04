@@ -84,7 +84,7 @@
         <strong>Completed At:</strong> {{ run.completed_at|default:"—" }}
     </div>
 
-    {% if active_step %}
+    {% if can_decide %}
     <div class="card">
         <h2>Make Decision</h2>
         <form method="post">
@@ -122,6 +122,34 @@
             {% empty %}
             <tr>
                 <td colspan="5">No steps found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+        <h2>Decision History</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Step</th>
+                <th>Outcome</th>
+                <th>Decided By</th>
+                <th>Decided At</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for decision in decisions %}
+            <tr>
+                <td>{{ decision.step_run.step.name }}</td>
+                <td>{{ decision.get_outcome_display }}</td>
+                <td>{{ decision.decided_by }}</td>
+                <td>{{ decision.decided_at }}</td>
+                <td>{{ decision.comment|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No decisions recorded yet.</td>
             </tr>
             {% endfor %}
         </tbody>
