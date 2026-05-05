@@ -40,6 +40,19 @@ class WorkflowRunDetailView(DetailView):
         context["can_decide"] = can_decide
         context["decision_form"] = WorkflowDecisionForm()
 
+        latest_decision = context["decisions"].first()
+
+        if active_step:
+            workflow_state_message = f"Waiting for {active_step.assigned_to} to review and decide"
+        elif latest_decision and latest_decision.outcome == "rejected":
+            workflow_state_message = "Workflow closed as rejected"
+        elif latest_decision and latest_decision.outcome == "escalated":
+            workflow_state_message = "Workflow escalated for external handling"
+        else:
+            workflow_state_message = "Workflow completed successfully"
+
+        context["workflow_state_message"] = workflow_state_message
+
         return context
 
     def post(self, request, *args, **kwargs):

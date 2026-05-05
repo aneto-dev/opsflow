@@ -69,6 +69,68 @@
             background: #f3f4f6;
             font-weight: 600;
         }
+        .badge-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font: inherit;
+            margin-top: 0.5rem;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+.btn-primary:hover {
+    background: #1f2937;
+}
     </style>
 </head>
 <body>
@@ -84,13 +146,43 @@
         <strong>Completed At:</strong> {{ run.completed_at|default:"—" }}
     </div>
 
+    <div class="card">
+        <h3>Current Workflow State</h3>
+
+        {% if active_step %}
+            <p><strong>Current Step:</strong> {{ active_step.step.name }}</p>
+            <p><strong>Assigned To:</strong> {{ active_step.assigned_to }}</p>
+            <p><strong>Available Action:</strong> {{ workflow_state_message }}</p>
+        {% else %}
+            <p><strong>Current Step:</strong> Complete</p>
+            <p><strong>Assigned To:</strong> —</p>
+            <p><strong>Available Action:</strong> {{ workflow_state_message }}</p>
+        {% endif %}
+    </div>
+
     {% if can_decide %}
     <div class="card">
         <h2>Make Decision</h2>
         <form method="post">
             {% csrf_token %}
-            {{ decision_form.as_p }}
-            <button type="submit">Submit Decision</button>
+
+            <div class="form-group">
+                <label><strong>Outcome</strong></label>
+                <div class="radio-group">
+                    {% for radio in decision_form.outcome %}
+                        <label class="radio-option">
+                            {{ radio.tag }} {{ radio.choice_label }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ decision_form.comment.id_for_label }}"><strong>Comment</strong></label>
+                {{ decision_form.comment }}
+            </div>
+
+            <button type="submit" class="btn-primary">Submit Decision</button>
         </form>
     </div>
     {% endif %}
@@ -127,7 +219,7 @@
         </tbody>
     </table>
 
-        <h2>Decision History</h2>
+    <h2>Decision History</h2>
     <table>
         <thead>
             <tr>
@@ -142,7 +234,17 @@
             {% for decision in decisions %}
             <tr>
                 <td>{{ decision.step_run.step.name }}</td>
-                <td>{{ decision.get_outcome_display }}</td>
+                <td>
+                    <span class="badge
+                        {% if decision.outcome == 'approved' %}badge-completed
+                        {% elif decision.outcome == 'rejected' %}badge-rejected
+                        {% elif decision.outcome == 'sent_back' %}badge-pending
+                        {% elif decision.outcome == 'escalated' %}badge-in-progress
+                        {% endif %}
+                    ">
+                        {{ decision.get_outcome_display }}
+                    </span>
+                </td>
                 <td>{{ decision.decided_by }}</td>
                 <td>{{ decision.decided_at }}</td>
                 <td>{{ decision.comment|default:"—" }}</td>
