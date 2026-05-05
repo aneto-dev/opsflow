@@ -64,10 +64,34 @@ class WorkflowService:
         next_step.save(update_fields=["status", "assigned_to"])
 
     @staticmethod
+    def _activate_previous_step(workflow_run: WorkflowRun, current_step_run: WorkflowStepRun) -> None:
+        previous_step = (
+            WorkflowStepRun.objects
+            .filter(
+                workflow_run=workflow_run,
+                step__order__lt=current_step_run.step.order,
+            )
+            .order_by("-step__order")
+            .first()
+        )
+
+        if not previous_step:
+            WorkflowService._complete_workflow(workflow_run)
+            return
+
+        previous_step.status = WorkflowStepRun.Status.IN_PROGRESS
+        previous_step.assigned_to = WorkflowService._resolve_actor(
+            previous_step.step.assigned_role,
+            workflow_run,
+        )
+        previous_step.completed_at = None
+        previous_step.save(update_fields=["status", "assigned_to", "completed_at"])
+
+    @staticmethod
     def _complete_workflow(workflow_run: WorkflowRun) -> None:
-        workflow_run.status = WorkflowRun.Status.COMPLETED
-        workflow_run.completed_at = timezone.now()
-        workflow_run.save(update_fields=["status", "completed_at"])
+            workflow_run.status = WorkflowRun.Status.COMPLETED
+            workflow_run.completed_at = timezone.now()
+            workflow_run.save(update_fields=["status", "completed_at"])
 
     @staticmethod
     @transaction.atomic
@@ -106,6 +130,14 @@ class WorkflowService:
 
         if outcome == WorkflowDecision.Outcome.REJECTED:
             WorkflowService._complete_workflow(step_run.workflow_run)
+    
+        elif outcome == WorkflowDecision.Outcome.SENT_BACK:
+            step_run.status = WorkflowStepRun.Status.PENDING
+            step_run.completed_at = None
+            step_run.save(update_fields=["status", "completed_at"])
+
+            WorkflowService._activate_previous_step(step_run.workflow_run, step_run)
+
         else:
             WorkflowService._activate_next_step(step_run.workflow_run)
 
