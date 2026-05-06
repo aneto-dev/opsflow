@@ -1,0 +1,13 @@
+<div class="card">
+    <h3>Current Workflow State</h3>
+
+    {% if active_step %}
+        <p><strong>Current Step:</strong> {{ active_step.step.name }}</p>
+        <p><strong>Assigned To:</strong> {{ active_step.assigned_to }}</p>
+        <p><strong>Available Action:</strong> {{ workflow_state_message }}</p>
+    {% else %}
+        <p><strong>Current Step:</strong> Complete</p>
+        <p><strong>Assigned To:</strong> —</p>
+        <p><strong>Available Action:</strong> {{ workflow_state_message }}</p>
+    {% endif %}
+</div>

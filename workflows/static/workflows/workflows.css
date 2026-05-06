@@ -1,0 +1,127 @@
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f9fafb;
+            color: #111827;
+        }
+
+        h1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .muted {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.in_progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+        .badge-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font: inherit;
+            margin-top: 0.5rem;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1f2937;
+        }

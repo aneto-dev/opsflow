@@ -1,5 +1,4 @@
 from django.contrib import admin
-from workflows.models import WorkflowDefinition,WorkflowRun
 from django.utils.html import format_html
 from workflows.services import WorkflowService
 
@@ -42,6 +41,8 @@ class WorkflowStepRunInline(admin.TabularInline):
             color,
             label,
         )
+    
+    status_badge.short_description = "Status"
 
 @admin.register(WorkflowRun)
 class WorkflowRunAdmin(admin.ModelAdmin):
@@ -92,24 +93,34 @@ class WorkflowStepRunAdmin(admin.ModelAdmin):
             label,
         )
     
+    status_badge.short_description = "Status"
+    
     @admin.action(description="Approve selected steps")
     def approve_steps(self, request, queryset):
         for step_run in queryset:
-            WorkflowService.record_decision(
-                step_run_id=step_run.id,
-                outcome="approved",
-                decided_by=request.user.username,
-                comment="Approved via admin",
-            )
+            try:
+                WorkflowService.record_decision(
+                    step_run_id=step_run.id,
+                    outcome="approved",
+                    decided_by=request.user.username,
+                    comment="Approved via admin",
+                )
+            except ValueError:
+                continue
+
+
     @admin.action(description="Reject selected steps")
     def reject_steps(self, request, queryset):
         for step_run in queryset:
-            WorkflowService.record_decision(
-                step_run_id=step_run.id,
-                outcome="rejected",
-                decided_by=request.user.username,
-                comment="Rejected via admin",
-            )
+            try:
+                WorkflowService.record_decision(
+                    step_run_id=step_run.id,
+                    outcome="rejected",
+                    decided_by=request.user.username,
+                    comment="Rejected via admin",
+                )
+            except ValueError:
+                continue
 
 @admin.register(WorkflowDecision)
 class WorkflowDecisionAdmin(admin.ModelAdmin):

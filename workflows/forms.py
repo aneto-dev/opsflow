@@ -10,12 +10,12 @@ class StartWorkflowForm(forms.Form):
     reference = forms.CharField(max_length=100)
     started_by = forms.CharField(max_length=100)
 
-
-class WorkflowDecisionForm(forms.Form):
+class DecisionForm(forms.Form):
     outcome = forms.ChoiceField(
         choices=WorkflowDecision.Outcome.choices,
         widget=forms.RadioSelect,
     )
+
     comment = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={"rows": 4}),

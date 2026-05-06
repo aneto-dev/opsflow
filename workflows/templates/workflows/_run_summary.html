@@ -1,0 +1,8 @@
+<div class="card">
+        <strong>Status:</strong>
+        <span class="badge {{ run.status }}">{{ run.get_status_display }}</span>
+        <br><br>
+        <strong>Started By:</strong> {{ run.started_by }}<br>
+        <strong>Started At:</strong> {{ run.started_at }}<br>
+        <strong>Completed At:</strong> {{ run.completed_at|default:"—" }}
+</div>

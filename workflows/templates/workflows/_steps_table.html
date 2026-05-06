@@ -1,0 +1,31 @@
+<h2>Steps</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Step</th>
+            <th>Assigned To</th>
+            <th>Status</th>
+            <th>Started</th>
+            <th>Completed</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for step in run.step_runs.all %}
+        <tr>
+            <td>{{ step.step.name }}</td>
+            <td>{{ step.assigned_to }}</td>
+            <td>
+                <span class="badge {{ step.status }}">
+                    {{ step.get_status_display }}
+                </span>
+            </td>
+            <td>{{ step.started_at|default:"—" }}</td>
+            <td>{{ step.completed_at|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No steps found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.utils import timezone
+from workflows.forms import DecisionForm
 
 from workflows.models import (
     WorkflowDefinition,
@@ -151,3 +152,68 @@ class WorkflowService:
         }
 
         return role_map.get(role, "system")
+    
+
+
+class WorkflowRunPageService:
+    def __init__(self, reference, user):
+        self.reference = reference
+        self.user = user
+        self.run = self._get_run()
+
+    def _get_run(self):
+        return (
+            WorkflowRun.objects
+            .select_related("workflow")
+            .prefetch_related(
+                "step_runs__step",
+                "step_runs__decisions",
+            )
+            .get(reference=self.reference)
+        )
+    
+    def _can_decide(self, active_step):
+        return (
+            active_step
+            and self.user.is_authenticated
+            and self.user.username == active_step.assigned_to
+        )
+    
+    def _get_workflow_state_message(self, active_step):
+        latest_decision = self._get_decisions().first()
+
+        if active_step:
+            return f"Waiting for {active_step.assigned_to} to review and decide"
+
+        if latest_decision and latest_decision.outcome == WorkflowDecision.Outcome.REJECTED:
+            return "Workflow closed as rejected"
+
+        if latest_decision and latest_decision.outcome == WorkflowDecision.Outcome.ESCALATED:
+            return "Workflow escalated for external handling"
+
+        return "Workflow completed successfully"
+
+    def build_context(self):
+        active_step = self._get_active_step()
+
+        return {
+            "run": self.run,
+            "active_step": active_step,
+            "can_decide": self._can_decide(active_step),
+            "decision_form": DecisionForm(),
+            "workflow_state_message": self._get_workflow_state_message(active_step),
+            "decisions": self._get_decisions(),
+        }
+
+    def _get_active_step(self):
+        return self.run.step_runs.filter(
+            status=WorkflowStepRun.Status.IN_PROGRESS
+        ).first()
+    
+    def _get_decisions(self):
+        return (
+            WorkflowDecision.objects
+            .filter(step_run__workflow_run=self.run)
+            .select_related("step_run", "step_run__step")
+            .order_by("-decided_at")
+        )
