@@ -69,3 +69,12 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
+
+---
+
+## Demo Data
+
+To seed clean demo workflow data for local development:
+
+```bash
+python manage.py seed_demo_workflows
