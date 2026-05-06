@@ -143,3 +143,11 @@ This project demonstrates:
 - auditability and traceability
 - access control and guarded decision submission
 - practical Django service-layer architecture
+
+## Screenshots
+
+### Workflow Runs
+![Workflow Runs](screenshots/workflow-runs.png)
+
+### Workflow Run Detail
+![Workflow Run Detail](screenshots/workflow-run-detail.png)
