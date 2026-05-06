@@ -68,13 +68,78 @@ source .venv/bin/activate   # macOS / Linux
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
+python manage.py seed_demo_workflows
 python manage.py runserver
+```
 
 ---
 
 ## Demo Data
 
-To seed clean demo workflow data for local development:
+To reseed clean demo workflow data for local development:
 
 ```bash
 python manage.py seed_demo_workflows
+```
+
+This will:
+
+- reset demo workflow data
+- recreate the Purchase Approval workflow
+- seed sample workflow runs
+- seed example approval decisions
+
+---
+
+## Local URLs
+
+Workflow runs list:
+
+```text
+http://127.0.0.1:8000/workflows/
+```
+
+Admin:
+
+```text
+http://127.0.0.1:8000/admin/
+```
+
+---
+
+## Demo Credentials
+
+Use the superuser account created during setup to:
+
+- access Django Admin
+- review workflow definitions
+- inspect workflow runs
+- review audit history
+- submit decisions
+
+---
+
+## What to review
+
+Start here:
+
+- `/workflows/` → workflow run list
+- click any workflow reference
+- inspect run state, step progression, and decision history
+
+Then review:
+
+- `/admin/` → workflow definitions, steps, runs, and decisions
+
+---
+
+## What this demonstrates
+
+This project demonstrates:
+
+- backend workflow orchestration
+- approval routing and actor assignment
+- state transition handling
+- auditability and traceability
+- access control and guarded decision submission
+- practical Django service-layer architecture
