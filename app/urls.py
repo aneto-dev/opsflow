@@ -1,10 +1,13 @@
 from django.contrib import admin
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import include, path
 
 
 def home(request):
-    return HttpResponse("OpsFlow is running successfully on Railway 🚀")
+    return HttpResponse("OpsFlow is running successfully !")
+
+def healthcheck(request):
+    return JsonResponse({"status": "healthy"})
 
 
 urlpatterns = [
