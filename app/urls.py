@@ -14,4 +14,5 @@ urlpatterns = [
     path("", home),
     path("admin/", admin.site.urls),
     path("workflows/", include("workflows.urls")),
+    path("healthcheck/", healthcheck),
 ]
