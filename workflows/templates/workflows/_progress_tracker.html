@@ -1,0 +1,46 @@
+<div class="card">
+
+    <div class="section-header">
+        <h2>Workflow Progress</h2>
+    </div>
+
+    <div class="progress-tracker">
+
+        {% for step_run in run.step_runs.all %}
+
+            <div class="progress-step">
+
+                <div
+                    class="progress-circle
+                    {% if step_run.status == 'completed' %}
+                        progress-completed
+                    {% elif step_run.status == 'in_progress' %}
+                        progress-active
+                    {% else %}
+                        progress-pending
+                    {% endif %}"
+                >
+
+                    {% if step_run.status == 'completed' %}
+                        ✓
+                    {% else %}
+                        {{ forloop.counter }}
+                    {% endif %}
+
+                </div>
+
+                <div class="progress-label">
+                    {{ step_run.step.name }}
+                </div>
+
+            </div>
+
+            {% if not forloop.last %}
+                <div class="progress-line"></div>
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</div>

@@ -10,17 +10,22 @@
             margin-bottom: 0.25rem;
         }
 
+        h1 {
+            font-size: 42px;
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            font-size: 30px;
+            margin-bottom: 18px;
+        }
+
         .muted {
             color: #6b7280;
             margin-bottom: 2rem;
         }
 
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
+       
 
         .badge {
             display: inline-block;
@@ -82,9 +87,7 @@
             background: #dbeafe;
             color: #1e40af;
         }
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+ 
 
         .radio-group {
             display: flex;
@@ -112,20 +115,7 @@
             box-sizing: border-box;
         }
 
-        .btn-primary {
-            background: #111827;
-            color: white;
-            border: none;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            background: #1f2937;
-        }
-
+    
         .decision-card {
     margin-top: 32px;
     padding: 24px;
@@ -156,4 +146,125 @@
 
 .btn-primary:hover {
     background: #1f2937;
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0;
+}
+
+.decision-comment {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #374151;
+    max-width: 420px;
+    line-height: 1.5;
+}
+
+table td {
+    padding: 18px 16px;
+}
+
+table tbody tr:hover {
+    background: #f9fafb;
+    transition: background 0.2s ease;
+}
+
+.empty-state {
+    text-align: center;
+    color: #6b7280;
+    padding: 30px;
+}
+
+table thead {
+    background: #f3f4f6;
+}
+
+table th {
+    color: #111827;
+    font-weight: 600;
+    padding: 16px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 28px;
+    border: 1px solid #e5e7eb;
+}
+
+.progress-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: fit-content;
+    margin: 32px auto 12px auto;
+}
+
+.progress-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.progress-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
+    font-size: 16px;
+
+    margin-bottom: 12px;
+
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.08);
+}
+
+.progress-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.progress-active {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.progress-pending {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.progress-line {
+    width: 100px;
+    height: 3px;
+    background: #d1d5db;
+    margin-bottom: 34px;
+}
+
+.progress-label {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    line-height: 1.4;
+}
+
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
 }

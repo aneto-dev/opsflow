@@ -1,37 +1,100 @@
-<h2>Decision History</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Step</th>
-            <th>Outcome</th>
-            <th>Decided By</th>
-            <th>Decided At</th>
-            <th>Comment</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for decision in decisions %}
-        <tr>
-            <td>{{ decision.step_run.step.name }}</td>
-            <td>
-                <span class="badge
-                    {% if decision.outcome == 'approved' %}badge-completed
-                    {% elif decision.outcome == 'rejected' %}badge-rejected
-                    {% elif decision.outcome == 'sent_back' %}badge-pending
-                    {% elif decision.outcome == 'escalated' %}badge-in-progress
-                    {% endif %}
-                ">
-                    {{ decision.get_outcome_display }}
-                </span>
-            </td>
-            <td>{{ decision.decided_by }}</td>
-            <td>{{ decision.decided_at }}</td>
-            <td>{{ decision.comment|default:"—" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5">No decisions recorded yet.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card">
+
+    <div class="section-header">
+        <h2>Decision History</h2>
+    </div>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Step</th>
+                <th>Outcome</th>
+                <th>Decided By</th>
+                <th>Decided At</th>
+                <th>Comment</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for decision in decisions %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ decision.step_run.step.name }}
+                        </strong>
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="badge
+
+                            {% if decision.outcome == 'approved' %}
+                                badge-completed
+
+                            {% elif decision.outcome == 'rejected' %}
+                                badge-rejected
+
+                            {% elif decision.outcome == 'sent_back' %}
+                                badge-pending
+
+                            {% elif decision.outcome == 'escalated' %}
+                                badge-in-progress
+
+                            {% endif %}
+                            "
+                        >
+                            {{ decision.get_outcome_display }}
+                        </span>
+
+                    </td>
+
+                    <td>
+                        {{ decision.decided_by }}
+                    </td>
+
+                    <td>
+                        {{ decision.decided_at|date:"d M Y, H:i" }}
+                    </td>
+
+                    <td>
+
+                        {% if decision.comment %}
+
+                            <div class="decision-comment">
+                                {{ decision.comment }}
+                            </div>
+
+                        {% else %}
+
+                            —
+                            
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+
+                    <td colspan="5" class="empty-state">
+                        No workflow decisions recorded yet.
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
