@@ -2,6 +2,7 @@ from django.db import transaction
 from django.utils import timezone
 from workflows.forms import WorkflowDecisionForm
 from workflows.permissions import WorkflowPermissionService
+from workflows.notifications import WorkflowNotificationService
 
 from workflows.models import (
     WorkflowDefinition,
@@ -134,6 +135,12 @@ class WorkflowService:
             comment=comment,
         )
 
+        WorkflowNotificationService.create_notification(
+            workflow_run=step_run.workflow_run,
+            recipient=step_run.assigned_to,
+            message=f"{decided_by} recorded a workflow decision.",
+        )
+
         step_run.status = WorkflowStepRun.Status.COMPLETED
         step_run.completed_at = timezone.now()
 
@@ -241,6 +248,7 @@ class WorkflowRunPageService:
             "workflow_state_message": self._get_workflow_state_message(active_step),
             "decisions": self._get_decisions(),
             "activity_feed": self._get_activity_feed(),
+            "notifications": self.run.notifications.all()[:5],
         }
 
     def _get_active_step(self):

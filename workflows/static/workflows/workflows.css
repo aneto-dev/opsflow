@@ -319,3 +319,27 @@ table th {
     border-radius: 8px;
     color: #374151;
 }
+
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.notification-item {
+    padding: 16px;
+    border-radius: 10px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.notification-message {
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.notification-meta {
+    font-size: 14px;
+    color: #6b7280;
+}

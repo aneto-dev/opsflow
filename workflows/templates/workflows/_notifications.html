@@ -1,0 +1,40 @@
+<div class="card">
+
+    <div class="section-header">
+        <h2>Notifications</h2>
+    </div>
+
+    <div class="notification-list">
+
+        {% for notification in notifications %}
+
+            <div class="notification-item">
+
+                <div class="notification-message">
+                    {{ notification.message }}
+                </div>
+
+                <div class="notification-meta">
+
+                    Sent to:
+                    <strong>{{ notification.recipient }}</strong>
+
+                    ·
+
+                    {{ notification.created_at|date:"d M Y, H:i" }}
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-state">
+                No notifications generated yet.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
