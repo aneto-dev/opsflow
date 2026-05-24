@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.utils import timezone
-from workflows.forms import DecisionForm
+from workflows.forms import WorkflowDecisionForm
 
 from workflows.models import (
     WorkflowDefinition,
@@ -97,12 +97,17 @@ class WorkflowService:
     @staticmethod
     @transaction.atomic
     def record_decision(
-        step_run_id: int,
+        step_run_id: str,
         outcome: str,
         decided_by: str,
-        comment: str = "",
+        comment: str,
     ) -> WorkflowDecision:
-        step_run = WorkflowStepRun.objects.select_related("workflow_run", "step").get(id=step_run_id)
+
+        step_run = (
+            WorkflowStepRun.objects
+            .select_related("workflow_run", "step")
+            .get(id=step_run_id)
+        )
 
         if step_run.status != WorkflowStepRun.Status.IN_PROGRESS:
             raise ValueError("Only in-progress steps can be decided.")
@@ -112,8 +117,11 @@ class WorkflowService:
 
         if step_run.workflow_run.status == WorkflowRun.Status.COMPLETED:
             raise ValueError("Completed workflows cannot be modified.")
-        
-        valid_outcomes = {choice[0] for choice in WorkflowDecision.Outcome.choices}
+
+        valid_outcomes = {
+            choice[0]
+            for choice in WorkflowDecision.Outcome.choices
+        }
 
         if outcome not in valid_outcomes:
             raise ValueError(f"Invalid decision outcome: {outcome}")
@@ -127,20 +135,42 @@ class WorkflowService:
 
         step_run.status = WorkflowStepRun.Status.COMPLETED
         step_run.completed_at = timezone.now()
-        step_run.save(update_fields=["status", "completed_at"])
+
+        step_run.save(
+            update_fields=[
+                "status",
+                "completed_at",
+            ]
+        )
 
         if outcome == WorkflowDecision.Outcome.REJECTED:
-            WorkflowService._complete_workflow(step_run.workflow_run)
-    
+
+            WorkflowService._complete_workflow(
+                step_run.workflow_run
+            )
+
         elif outcome == WorkflowDecision.Outcome.SENT_BACK:
+
             step_run.status = WorkflowStepRun.Status.PENDING
             step_run.completed_at = None
-            step_run.save(update_fields=["status", "completed_at"])
 
-            WorkflowService._activate_previous_step(step_run.workflow_run, step_run)
+            step_run.save(
+                update_fields=[
+                    "status",
+                    "completed_at",
+                ]
+            )
+
+            WorkflowService._activate_previous_step(
+                step_run.workflow_run,
+                step_run,
+            )
 
         else:
-            WorkflowService._activate_next_step(step_run.workflow_run)
+
+            WorkflowService._activate_next_step(
+                step_run.workflow_run
+            )
 
         return decision
     
@@ -188,7 +218,10 @@ class WorkflowRunPageService:
         if latest_decision and latest_decision.outcome == WorkflowDecision.Outcome.REJECTED:
             return "Workflow closed as rejected"
 
-        if latest_decision and latest_decision.outcome == WorkflowDecision.Outcome.ESCALATED:
+        if (latest_decision
+            and latest_decision.outcome == WorkflowDecision.Outcome.ESCALATED
+            and active_step
+        ):
             return "Workflow escalated for external handling"
 
         return "Workflow completed successfully"
@@ -200,7 +233,7 @@ class WorkflowRunPageService:
             "run": self.run,
             "active_step": active_step,
             "can_decide": self._can_decide(active_step),
-            "decision_form": DecisionForm(),
+            "decision_form": WorkflowDecisionForm(),
             "workflow_state_message": self._get_workflow_state_message(active_step),
             "decisions": self._get_decisions(),
         }

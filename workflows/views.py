@@ -1,11 +1,15 @@
-from django.http import HttpResponseForbidden
-
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView
 
 from workflows.models import WorkflowRun, WorkflowStepRun
-from workflows.forms import DecisionForm
 from workflows.services import WorkflowService, WorkflowRunPageService
+
+from django.shortcuts import get_object_or_404
+from django.views import View
+from django.contrib import messages
+from django.shortcuts import redirect
+
+from workflows.forms import WorkflowDecisionForm
 
 
 class WorkflowRunListView(ListView):
@@ -26,6 +30,8 @@ class WorkflowRunDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        context["decision_form"] = WorkflowDecisionForm()
+
         page_service = WorkflowRunPageService(
             reference=self.object.reference,
             user=self.request.user,
@@ -34,7 +40,7 @@ class WorkflowRunDetailView(DetailView):
         context.update(page_service.build_context())
         return context
 
-    def post(self, request, *args, **kwargs):
+"""     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
         form = DecisionForm(request.POST)
@@ -62,4 +68,43 @@ class WorkflowRunDetailView(DetailView):
             comment=form.cleaned_data["comment"],
         )
 
-        return redirect("workflow-run-detail", reference=self.object.reference)
+        return redirect("workflow-run-detail", reference=self.object.reference) """
+
+class WorkflowDecisionView(View):
+
+    def post(self, request, step_run_id):
+
+        step_run = get_object_or_404(
+            WorkflowStepRun,
+            id=step_run_id,
+        )
+
+        form = WorkflowDecisionForm(request.POST)
+
+        if not form.is_valid():
+            messages.error(
+                request,
+                "Invalid workflow decision.",
+            )
+
+            return redirect(
+                "workflow-run-detail",
+                reference=step_run.workflow_run.reference,
+            )
+
+        WorkflowService.record_decision(
+            step_run_id=step_run.id,
+            outcome=form.cleaned_data["decision"],
+            decided_by="aires",
+            comment=form.cleaned_data["comment"],
+        )
+
+        messages.success(
+            request,
+            "Workflow decision recorded.",
+        )
+
+        return redirect(
+            "workflow-run-detail",
+            reference=step_run.workflow_run.reference,
+        )

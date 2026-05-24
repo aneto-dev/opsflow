@@ -5,16 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ run.reference }}</title>
-    <link rel="stylesheet" href="{% static 'workflows/workflows.css' %}">
+
+    <link
+        rel="stylesheet"
+        href="{% static 'workflows/workflows.css' %}"
+    >
 </head>
 <body>
+
     <h1>{{ run.reference }}</h1>
-    <div class="muted">{{ run.workflow.name }}</div>
+
+    <div class="muted">
+        {{ run.workflow.name }}
+    </div>
 
     {% include "workflows/_run_summary.html" %}
     {% include "workflows/_workflow_state.html" %}
+
     {% include "workflows/_decision_form.html" %}
+
     {% include "workflows/_steps_table.html" %}
     {% include "workflows/_decision_history.html" %}
+
 </body>
 </html>

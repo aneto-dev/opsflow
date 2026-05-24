@@ -1,28 +1,33 @@
 {% if can_decide %}
-<div class="card">
-    <h2>Make Decision</h2>
-    <form method="post">
+
+<div class="decision-card">
+
+    <h3>Record Decision</h3>
+
+    <form
+        method="post"
+        action="{% url 'workflow-decision' active_step.id %}"
+    >
+
         {% csrf_token %}
 
         <div class="form-group">
-            <label><strong>Outcome</strong></label>
-            <div class="radio-group">
-                {% for radio in decision_form.outcome %}
-                    <label class="radio-option">
-                        {{ radio.tag }} {{ radio.choice_label }}
-                    </label>
-                {% endfor %}
-            </div>
+            {{ decision_form.decision }}
         </div>
 
         <div class="form-group">
-            <label for="{{ decision_form.comment.id_for_label }}">
-                <strong>Comment</strong>
-            </label>
             {{ decision_form.comment }}
         </div>
 
-        <button type="submit" class="btn-primary">Submit Decision</button>
+        <button
+            type="submit"
+            class="btn-primary"
+        >
+            Submit Decision
+        </button>
+
     </form>
+
 </div>
+
 {% endif %}

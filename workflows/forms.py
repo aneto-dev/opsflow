@@ -20,3 +20,28 @@ class DecisionForm(forms.Form):
         required=False,
         widget=forms.Textarea(attrs={"rows": 4}),
     )
+
+from django import forms
+
+
+class WorkflowDecisionForm(forms.Form):
+    DECISION_CHOICES = [
+        ("approved", "Approve"),
+        ("rejected", "Reject"),
+        ("sent_back", "Send Back"),
+    ]
+
+    decision = forms.ChoiceField(
+        choices=DECISION_CHOICES,
+        widget=forms.RadioSelect,
+    )
+
+    comment = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 4,
+                "placeholder": "Add optional comment...",
+            }
+        ),
+    )
