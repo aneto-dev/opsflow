@@ -7,10 +7,9 @@ from workflows.services import WorkflowService, WorkflowRunPageService
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.contrib import messages
-from django.shortcuts import redirect
 
 from workflows.forms import WorkflowDecisionForm
-
+from workflows.permissions import WorkflowPermissionService
 
 class WorkflowRunListView(ListView):
     model = WorkflowRun
@@ -40,36 +39,6 @@ class WorkflowRunDetailView(DetailView):
         context.update(page_service.build_context())
         return context
 
-"""     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        form = DecisionForm(request.POST)
-
-        if not form.is_valid():
-            return redirect("workflow-run-detail", reference=self.object.reference)
-
-        active_step = self.object.step_runs.filter(
-            status=WorkflowStepRun.Status.IN_PROGRESS
-        ).first()
-
-        if not active_step:
-            return HttpResponseForbidden("No active step available.")
-
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden("Authentication required.")
-
-        if request.user.username != active_step.assigned_to:
-            return HttpResponseForbidden("You are not allowed to decide this step.")
-
-        WorkflowService.record_decision(
-            step_run_id=active_step.id,
-            outcome=form.cleaned_data["outcome"],
-            decided_by=request.user.username,
-            comment=form.cleaned_data["comment"],
-        )
-
-        return redirect("workflow-run-detail", reference=self.object.reference) """
-
 class WorkflowDecisionView(View):
 
     def post(self, request, step_run_id):
@@ -78,6 +47,20 @@ class WorkflowDecisionView(View):
             WorkflowStepRun,
             id=step_run_id,
         )
+
+        if not WorkflowPermissionService.can_decide_step(
+            user=request.user,
+            step_run=step_run,
+        ):
+            messages.error(
+                request,
+                "You do not have permission to decide this workflow step.",
+            )
+
+            return redirect(
+                "workflow-run-detail",
+                reference=step_run.workflow_run.reference,
+            )
 
         form = WorkflowDecisionForm(request.POST)
 
@@ -95,7 +78,7 @@ class WorkflowDecisionView(View):
         WorkflowService.record_decision(
             step_run_id=step_run.id,
             outcome=form.cleaned_data["decision"],
-            decided_by="aires",
+            decided_by=request.user.username,
             comment=form.cleaned_data["comment"],
         )
 

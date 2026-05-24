@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
 from workflows.forms import WorkflowDecisionForm
+from workflows.permissions import WorkflowPermissionService
 
 from workflows.models import (
     WorkflowDefinition,
@@ -203,10 +204,13 @@ class WorkflowRunPageService:
         )
     
     def _can_decide(self, active_step):
-        return (
-            active_step
-            and self.user.is_authenticated
-            and self.user.username == active_step.assigned_to
+
+        if not active_step:
+            return False
+
+        return WorkflowPermissionService.can_decide_step(
+            user=self.user,
+            step_run=active_step,
         )
     
     def _get_workflow_state_message(self, active_step):
@@ -218,9 +222,9 @@ class WorkflowRunPageService:
         if latest_decision and latest_decision.outcome == WorkflowDecision.Outcome.REJECTED:
             return "Workflow closed as rejected"
 
-        if (latest_decision
+        if (
+            latest_decision
             and latest_decision.outcome == WorkflowDecision.Outcome.ESCALATED
-            and active_step
         ):
             return "Workflow escalated for external handling"
 
