@@ -240,6 +240,7 @@ class WorkflowRunPageService:
             "decision_form": WorkflowDecisionForm(),
             "workflow_state_message": self._get_workflow_state_message(active_step),
             "decisions": self._get_decisions(),
+            "activity_feed": self._get_activity_feed(),
         }
 
     def _get_active_step(self):
@@ -253,4 +254,30 @@ class WorkflowRunPageService:
             .filter(step_run__workflow_run=self.run)
             .select_related("step_run", "step_run__step")
             .order_by("-decided_at")
+        )
+    
+    def _get_activity_feed(self):
+
+        activities = []
+
+        activities.append({
+            "actor": self.run.started_by,
+            "action": "started the workflow",
+            "timestamp": self.run.started_at,
+            "comment": None,
+        })
+
+        for decision in self._get_decisions():
+
+            activities.append({
+                "actor": decision.decided_by,
+                "action": decision.get_outcome_display(),
+                "timestamp": decision.decided_at,
+                "comment": decision.comment,
+            })
+
+        return sorted(
+            activities,
+            key=lambda activity: activity["timestamp"],
+            reverse=True,
         )

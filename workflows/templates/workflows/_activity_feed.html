@@ -1,0 +1,57 @@
+<div class="card">
+
+    <div class="section-header">
+        <h2>Recent Activity</h2>
+    </div>
+
+    <div class="activity-feed">
+
+        {% for activity in activity_feed %}
+
+            <div class="activity-item">
+
+                <div class="activity-marker"></div>
+
+                <div class="activity-content">
+
+                    <div class="activity-header">
+
+                        <strong>
+                            {{ activity.actor }}
+                        </strong>
+
+                        <span class="activity-action">
+                            {{ activity.action }}
+                        </span>
+
+                    </div>
+
+                    <div class="activity-meta">
+
+                        {{ activity.timestamp|date:"d M Y, H:i" }}
+
+                    </div>
+
+                    {% if activity.comment %}
+
+                        <div class="activity-comment">
+                            {{ activity.comment }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-state">
+                No activity recorded yet.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
